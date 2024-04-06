@@ -1,0 +1,75 @@
+import { faSquare, faSquareCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect } from 'react';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
+
+const ProductsList = (props) => {
+    const { listId, products,
+        shoppingListAction, closeModal,
+    } = props;
+
+    const toggleProductHandler = (productName) => {
+        console.log("toggle-product-accomplished");
+        const result = shoppingListAction("toggle-product-accomplished",
+            {
+                listId: listId,
+                productName: productName
+            });
+        closeModal();
+        console.log("result: ", result);
+    }
+
+    const removeProductHandler = (productName) => {
+        console.log("removing product");
+        const result = shoppingListAction("remove-product",
+            {
+                listId: listId,
+                productName: productName
+            });
+        closeModal();
+        console.log("result: ", result);
+    }
+
+    useEffect(() => {
+        console.log(products);
+    }, [products]);
+
+    if (!products) {
+        return (
+            <p>Undefined products</p>
+        )
+    }
+
+    return (
+        <ListGroup defaultActiveKey="#link1" className="h-80 overflow-auto">
+            {products.map((product, i) => {
+                return (
+                    <ListGroup.Item
+                        key={i}
+                        className={`d-flex my-2 align-items-center rounded ${product.accomplished ? "bg-secondary" : "bg-info"}`}
+                        action={product.accomplished ? false : true}
+                        onClick={() => toggleProductHandler(product.productName)}
+                    >
+                        <span className='me-3'>
+                            <FontAwesomeIcon size="2x" icon={product.accomplished ? faSquareCheck : faSquare} />
+                        </span>
+
+                        <strong >
+                            {product.productName}
+                        </strong>
+
+                        <Button
+                            className='ms-auto' variant="danger"
+                            onClick={() => removeProductHandler(product.productName)}
+                        >
+                            <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                    </ListGroup.Item>
+                )
+            })}
+        </ListGroup>
+    );
+}
+
+export default ProductsList;
