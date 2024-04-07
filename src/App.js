@@ -235,6 +235,7 @@ function App() {
       </Container>
 
       <Footer />
+      <div style={{width: "100%", height: "75px"}}></div>
     </>
   );
 }

@@ -8,7 +8,7 @@ const IconButton = (props) => {
 
     useEffect(() => {
         const newStylíng = "" + styling;
-        setStyle(styling);
+        setStyle(newStylíng);
     }, [styling]);
 
     return (

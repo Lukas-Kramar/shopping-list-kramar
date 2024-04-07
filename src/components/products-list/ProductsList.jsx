@@ -42,7 +42,7 @@ const ProductsList = (props) => {
     }
 
     return (
-        <ListGroup defaultActiveKey="#link1" className="h-80 overflow-auto">
+        <ListGroup defaultActiveKey="#link1" className="h-60 overflow-auto">
             {products.map((product, i) => {
                 return (
                     <ListGroup.Item
