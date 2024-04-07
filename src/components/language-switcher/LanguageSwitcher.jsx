@@ -11,9 +11,10 @@ const LanguageSwitcher = () => {
 
     return (
         <div className="mb-3">
-            {languages.map((lang) => {
+            {languages.map((lang, i) => {
                 return lang === selectedLanguage ? (
                     <Button
+                        key={i}
                         variant="secondary"
                         disabled
                         className="mx-1 fw-bold"
@@ -22,6 +23,7 @@ const LanguageSwitcher = () => {
                     </Button>
                 ) : (
                     <Button
+                        key={i}
                         variant="primary"
                         className="mx-1 fw-bold"
                         disabled

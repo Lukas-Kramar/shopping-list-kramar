@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconButton from "../../components/buttons/IconButton";
 import Spinner from 'react-bootstrap/Spinner';
 import Container from 'react-bootstrap/Container'
@@ -15,7 +15,6 @@ import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 
 import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
 
 const ShoppingListDetail = (prop) => {
     const { shoppingList, shoppingListAction } = prop;
@@ -25,18 +24,8 @@ const ShoppingListDetail = (prop) => {
     const [productName, setProductName] = useState("");
     const [listName, setListName] = useState("");
     const [showAccomplished, setShowAccomplished] = useState(false);
-    const [managedMembers, setManagedMembers] = useState({ add: [], remove: [] });
 
     const user = useUser();
-
-    // listId: "abcdf", ownerId: "123", membersIds: new Set(["234", "345"]),
-    //     listName: "První shopping list",
-    //         productsInList: [
-    //             { productName: "Mléko", accomplished: false },
-    //             { productName: "Mouka", accomplished: false },
-    //             { productName: "Pažitka", accomplished: true }
-    //         ],
-    //             archived: null
 
     const addProductHandler = () => {
         console.log("adding product");
@@ -49,9 +38,6 @@ const ShoppingListDetail = (prop) => {
         closeModal();
         console.log("result: ", result);
     }
-    const createNewListHandler = () => {
-        console.log("creating new list");
-    }
     const renameListHandler = () => {
         console.log("edit-list-name");
         const result = shoppingListAction("edit-list-name",
@@ -62,12 +48,6 @@ const ShoppingListDetail = (prop) => {
         closeModal();
         console.log("result: ", result);
 
-    }
-    const archiveListHandler = () => {
-        console.log("archiving list");
-    }
-    const deleteListHandler = () => {
-        console.log("removing list");
     }
     const leaveListHandler = () => {
         console.log("leaving list");
@@ -91,7 +71,6 @@ const ShoppingListDetail = (prop) => {
     }
     const addlistMemberHandler = (memberToAdd) => {
         console.log("adding user to list");
-        console.log("memberToAdd: ", memberToAdd);
         const result = shoppingListAction("add-list-member",
             {
                 listId: shoppingList.listId,
@@ -101,14 +80,21 @@ const ShoppingListDetail = (prop) => {
         console.log("result: ", result);
     }
 
+    // TODO - next homework
+    const archiveListHandler = () => {
+        console.log("archiving list");
+    }
+    const deleteListHandler = () => {
+        console.log("removing list");
+    }
+    const createNewListHandler = () => {
+        console.log("creating new list");
+    }
+
     const closeModal = () => {
         setFormChange(false);
         setModalVersion("");
     }
-
-    useEffect(() => {
-        console.log("user: ", user);
-    }, [user]);
 
     const showModal = (modalVersion) => {
         const possibleModal = [
@@ -265,11 +251,11 @@ const ShoppingListDetail = (prop) => {
                                     </Dropdown.Toggle>
 
                                     <Dropdown.Menu className="border-secondary border-2">
-                                        {USERS.map((us) => {
-                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.has(us.id)) return <></>
+                                        {USERS.map((us, i) => {
+                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.has(us.id)) return <React.Fragment key={i}></React.Fragment>
                                             else {
                                                 return (
-                                                    <Dropdown.Item onClick={() => addlistMemberHandler(us.id)}>
+                                                    <Dropdown.Item key={i} onClick={() => addlistMemberHandler(us.id)}>
                                                         <FontAwesomeIcon icon={faCirclePlus} className="me-4" />
                                                         <span className="fw-bold">{us.name}</span>
                                                     </Dropdown.Item>
