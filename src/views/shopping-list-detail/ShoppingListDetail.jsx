@@ -83,12 +83,19 @@ const ShoppingListDetail = (prop) => {
     // TODO - next homework
     const archiveListHandler = () => {
         console.log("archiving list");
+        const result = shoppingListAction("archive-list", {
+            listId: shoppingList.listId,
+        });
+        console.log("result: ", result);
+        closeModal();
     }
     const deleteListHandler = () => {
         console.log("removing list");
-    }
-    const createNewListHandler = () => {
-        console.log("creating new list");
+        const result = shoppingListAction("delete-list", {
+            listId: shoppingList.listId,
+        });
+        console.log("result: ", result);
+        closeModal();
     }
 
     const closeModal = () => {
@@ -98,7 +105,8 @@ const ShoppingListDetail = (prop) => {
 
     const showModal = (modalVersion) => {
         const possibleModal = [
-            "view-list-members", "leave-list", "add-product", "rename-list"
+            "view-list-members", "leave-list", "add-product", "rename-list", "remove-list",
+            "delete-list", "archive-list",
         ];
 
         if (possibleModal.includes(modalVersion)) {
@@ -212,7 +220,7 @@ const ShoppingListDetail = (prop) => {
                 <BasicModal
                     visible={modalVersion === "archive-list"}
                     title="Archive list"
-                    text={`Do you really want to Archive this list:${shoppingList.listName}`}
+                    text={`Do you really want to Archive this list: ${shoppingList.listName}`}
                     closeButtonText="Close"
                     actionButtonText="Archive"
                     onActionButtonClick={archiveListHandler}
@@ -224,7 +232,7 @@ const ShoppingListDetail = (prop) => {
                 <BasicModal
                     visible={modalVersion === "delete-list"}
                     title="Delete list"
-                    text={`Do you really want to Delete this list:${shoppingList.listName}`}
+                    text={`Do you really want to Delete this list: ${shoppingList.listName}`}
                     closeButtonText="Close"
                     actionButtonText="Delete"
                     onActionButtonClick={deleteListHandler}
@@ -357,7 +365,12 @@ const ShoppingListDetail = (prop) => {
                 </BasicModal>
 
                 <Container className="mt-4" fluid style={{ backgroundColor: "#f4f4f4" }}>
-                    <h2>{shoppingList.listName ? shoppingList.listName : "-----"}</h2>
+                    <h2>
+                        {shoppingList.listName ?
+                            `${shoppingList.listName} ${shoppingList.archived ? "(ARCHIVED)" : ""}`
+                            : "-----"
+                        }
+                    </h2>
                     <Row className="mt-3">
                         <Col className="d-flex">
                             {shoppingList?.ownerId === user?.id ?
@@ -383,11 +396,19 @@ const ShoppingListDetail = (prop) => {
                                                 <FontAwesomeIcon icon={faPen} className="me-4" />
                                                 <span className="fw-bold">Rename list</span>
                                             </Dropdown.Item>
-                                            <Dropdown.Item href="#/action-2">
+                                            <Dropdown.Item
+                                                onClick={() => {
+                                                    showModal("archive-list");
+                                                }}
+                                            >
                                                 <FontAwesomeIcon icon={faBookBookmark} className="me-4" />
                                                 <span className="fw-bold"> Archive list</span>
                                             </Dropdown.Item>
-                                            <Dropdown.Item href="#/action-3">
+                                            <Dropdown.Item
+                                                onClick={() => {
+                                                    showModal("delete-list");
+                                                }}
+                                            >
                                                 <FontAwesomeIcon icon={faTrash} className="me-4" />
                                                 <span className="fw-bold"> Delete list</span>
                                             </Dropdown.Item>
@@ -467,7 +488,9 @@ const ShoppingListDetail = (prop) => {
             <Row>
                 <Col>
                     <h2>Error 404: List not found</h2>
-                    <Alert variant="danger" >List with this id doesn't exists, or you are not a member of it.</Alert>
+                    <Alert variant="danger" >
+                        List with this id doesn't exists, or you are not a member of it.
+                    </Alert>
                 </Col>
             </Row>
         </Container>

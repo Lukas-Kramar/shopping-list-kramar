@@ -6,9 +6,13 @@ import { useUser } from './components/header/user';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Alert from 'react-bootstrap/Alert'
 import ShoppingListDetail from './views/shopping-list-detail/ShoppingListDetail';
 import Footer from './components/footer/Footer';
 import Header from './components/header/Header';
+
+import { v4 as uuidv4 } from 'uuid';
+import Lists from './components/lists/Lists';
 
 const defaultShoppingList = [
   {
@@ -25,7 +29,7 @@ const defaultShoppingList = [
       { productName: "Mouka5", accomplished: false },
       { productName: "Pažitka6", accomplished: true },
     ],
-    archived: null,
+    archived: false,
   },
   {
     listId: "fjowefjweoifj", ownerId: "234", membersIds: new Set(["123", "345", "456"]),
@@ -36,14 +40,28 @@ const defaultShoppingList = [
       { productName: "Okurka", accomplished: true },
       { productName: "Máslo", accomplished: false }
     ],
-    archived: null,
+    archived: false,
+  },
+  {
+    listId: "aaaaaaaaa", ownerId: "234", membersIds: new Set(["123", "345", "456"]),
+    listName: "Shopping list pro všechny",
+    productsInList: [
+      { productName: "Jablka", accomplished: true },
+      { productName: "Citróny", accomplished: true },
+      { productName: "Okurka", accomplished: true },
+      { productName: "Máslo", accomplished: true }
+    ],
+    archived: true,
   }
 ]
 
 
 function App() {
-  const [shoppingLists, setShoppingLists] = useState(defaultShoppingList);
   const user = useUser();
+
+  const [shoppingLists, setShoppingLists] = useState(defaultShoppingList);
+  const [selectedShoppingList, setSelectedShoppingList] = useState(defaultShoppingList.length > 0 ? defaultShoppingList[0] : null);
+
 
   const shoppingListAction = (action, data) => {
 
@@ -81,7 +99,6 @@ function App() {
         throw new Error("Required data fields (listId, productName) are missing.");
       }
     }
-
 
     try {
       if (action === "add-product") {
@@ -199,6 +216,57 @@ function App() {
           throw new Error("Required data fields (listId, newMemberId) are missing.");
         }
       }
+
+      else if (action === "create-list") {
+        if (data.list) {
+          const list = data.list;
+
+          list.listId = uuidv4();
+          console.log(list);
+          setShoppingLists([...shoppingLists, list]);
+          return list;
+        }
+        else {
+          throw new Error("list is not an object");
+        }
+      }
+      else if (action === "delete-list") {
+        if (data.listId) {
+          const listIndex = shoppingLists.findIndex((list) => list.listId === data.listId);
+          if (listIndex > -1) {
+            const updatedLists = [...shoppingLists];
+            updatedLists.splice(listIndex, 1); // Remove the list at the found index
+
+            setSelectedShoppingList(updatedLists.length > 0 ? updatedLists[0] : null);
+            setShoppingLists(updatedLists);
+            return "removed";
+          } else {
+            throw new Error(`List with ID '${data.listId}' not found.`);
+          }
+        }
+        else {
+          throw new Error("listId not is empty string");
+        }
+      }
+      else if (action === "archive-list") {
+        if (data.listId) {
+          const listIndex = shoppingLists.findIndex((list) => list.listId === data.listId);
+          if (listIndex > -1) {
+            const newList = { ...shoppingLists[listIndex], archived: true };
+            const updatedLists = [...shoppingLists];
+            updatedLists[listIndex] = newList;
+            setShoppingLists(updatedLists);
+            return "archived";
+          } else {
+            throw new Error(`List with ID '${data.listId}' not found.`);
+          }
+        }
+        else {
+          throw new Error("listId not is empty string");
+        }
+      }
+
+
       else {
         console.warn("There is no such action as: ", action);
         return false;
@@ -213,29 +281,51 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header
+        shoppingLists={shoppingLists}
+        shoppingListAction={shoppingListAction}
+        selectedShoppingList={selectedShoppingList}
+        setSelectedShoppingList={setSelectedShoppingList}
+      />
 
       <Container>
 
         <Row>
           <Col xs={12} xl={7} className="">
             <main>
-              <ShoppingListDetail
-                shoppingList={shoppingLists[0]}
-                shoppingListAction={shoppingListAction}
-              />
+              {selectedShoppingList ?
+                <ShoppingListDetail
+                  shoppingList={selectedShoppingList}
+                  shoppingListAction={shoppingListAction}
+                />
+                :
+                <Alert variant="danger">
+                  No shopping list selected (if none are present - we would be happy if you could create one)
+                </Alert>
+              }
             </main>
           </Col>
-          <Col xl={5} className=" d-none d-xl-block">
-            <Row className="mt-4 container-fluid bg-warning">
+          <Col xl={5} className="mt-4 d-none d-xl-block" style={{ backgroundColor: "#f4f4f4" }}>
+
+            <Row className=" mb-3 container-fluid ">
               <h1>Shopping lists:</h1>
             </Row>
+
+            <Row >
+              <Lists
+                shoppingListAction={shoppingListAction}
+                shoppingLists={shoppingLists}
+                selectedShoppingList={selectedShoppingList}
+                setSelectedShoppingList={setSelectedShoppingList}
+              />
+            </Row>
+
           </Col>
         </Row>
       </Container>
 
       <Footer />
-      <div style={{width: "100%", height: "75px"}}></div>
+      <div style={{ width: "100%", height: "75px" }}></div>
     </>
   );
 }
