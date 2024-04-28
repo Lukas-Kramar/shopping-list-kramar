@@ -1,6 +1,6 @@
 
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from './components/header/user';
 
 import Container from 'react-bootstrap/Container';
@@ -13,6 +13,7 @@ import Header from './components/header/Header';
 
 import { v4 as uuidv4 } from 'uuid';
 import Lists from './components/lists/Lists';
+import { createShoppingList, deleteShoppingList, getShoppingLists, updateShoppingList } from './api/apiCalls';
 
 const defaultShoppingList = [
   {
@@ -59,21 +60,59 @@ const defaultShoppingList = [
 function App() {
   const user = useUser();
 
-  const [shoppingLists, setShoppingLists] = useState(defaultShoppingList);
-  const [selectedShoppingList, setSelectedShoppingList] = useState(defaultShoppingList.length > 0 ? defaultShoppingList[0] : null);
+  const [shoppingLists, setShoppingLists] = useState({ dataList: [], state: "", errors: [] });
+  const [selectedShoppingList, setSelectedShoppingList] = useState(null);
+
+  useEffect(() => {
+    const getAllShoppingLists = async () => {
+      try {
+        setShoppingLists((prevShoppingLists) => ({
+          ...prevShoppingLists,
+          state: "pending",
+        }));
+
+        const response = await getShoppingLists();
+        if (response.length > 0) {
+          setShoppingLists((prevShoppingLists) => ({
+            ...prevShoppingLists,
+            dataList: response,
+          }));
+          setSelectedShoppingList(response[0]);
+        }
+        console.log("Response - get all shopping-lists: ", response);
+      } catch (err) {
+        setShoppingLists((prevShoppingLists) => ({
+          ...prevShoppingLists,
+          error: [...prevShoppingLists.error, err],
+        }));
+        console.error("Error:", err.message);
+      } finally {
+        setShoppingLists((prevShoppingLists) => ({
+          ...prevShoppingLists,
+          state: "done",
+        }));
+      }
+    };
+
+    getAllShoppingLists();
+  }, []);
 
 
-  const shoppingListAction = (action, data) => {
+  useEffect(() => {
+    console.log("Shopping lists: ", shoppingLists);
+  }, [shoppingLists]);
+
+  const shoppingListAction = async (action, data) => {
 
     function modifyProduct(action, data) {
       if (data?.listId && data?.productName) {
-        const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+        const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
         if (listIndex > -1) {
-          const productIndex = shoppingLists[listIndex].products.findIndex(
+          const productIndex = shoppingLists.dataList[listIndex].products.findIndex(
             (pr) => pr.productName === data.productName
           );
           if (productIndex > -1) {
-            const updatedLists = [...shoppingLists];
+            const updatedLists = [...shoppingLists.dataList];
             if (action === "add-product") {
               const productExists = updatedLists[listIndex].products.some(
                 (pr) => pr.productName === data.product.productName
@@ -88,7 +127,7 @@ function App() {
             } else {
               throw new Error(`Invalid action: ${action}`);
             }
-            setShoppingLists(updatedLists);
+            setShoppingLists({ ...shoppingLists, dataList: updatedLists });
           } else {
             throw new Error(`Product with name '${data.productName}' not found in the list.`);
           }
@@ -103,15 +142,22 @@ function App() {
     try {
       if (action === "add-product") {
         if (data?.listId && data?.product?.productName) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
-            const productExists = shoppingLists[listIndex].productsInList.some(
+            const productExists = shoppingLists.dataList[listIndex].productsInList.some(
               (pr) => pr.productName === data.product.productName
             );
             if (!productExists) {
-              const updatedLists = [...shoppingLists];
+              const updatedLists = [...shoppingLists.dataList];
               updatedLists[listIndex].productsInList.push(data.product);
-              setShoppingLists(updatedLists);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
+
+              // setShoppingLists({ ...shoppingLists, dataList: updatedLists });
             } else {
               throw new Error(`Product with name '${data.product.productName}' is already in the list.`);
             }
@@ -122,15 +168,22 @@ function App() {
       }
       else if (action === "remove-product") {
         if (data?.listId && data?.productName) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
-            const productIndex = shoppingLists[listIndex].productsInList.findIndex(
+            const productIndex = shoppingLists.dataList[listIndex].productsInList.findIndex(
               (pr) => pr.productName === data.productName
             );
             if (productIndex > -1) {
-              const updatedLists = [...shoppingLists];
+              const updatedLists = [...shoppingLists.dataList];
               updatedLists[listIndex].productsInList.splice(productIndex, 1);
-              setShoppingLists(updatedLists);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
+              // setShoppingLists({ ...shoppingLists, dataList: updatedLists });
             } else {
               throw new Error(`Product with name '${data.productName}' not found in the list.`);
             }
@@ -141,15 +194,22 @@ function App() {
       }
       else if (action === "toggle-product-accomplished") {
         if (data?.listId && data?.productName) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
-            const productIndex = shoppingLists[listIndex].productsInList.findIndex(
+            const productIndex = shoppingLists.dataList[listIndex].productsInList.findIndex(
               (pr) => pr.productName === data.productName
             );
             if (productIndex > -1) {
-              const updatedLists = [...shoppingLists];
+              const updatedLists = [...shoppingLists.dataList];
               updatedLists[listIndex].productsInList[productIndex].accomplished = !updatedLists[listIndex].productsInList[productIndex].accomplished;
-              setShoppingLists(updatedLists);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
+              // setShoppingLists({ ...shoppingLists, dataList: updatedLists });
             } else {
               throw new Error(`Product with name '${data.productName}' not found in the list.`);
             }
@@ -158,14 +218,20 @@ function App() {
           }
         }
       }
+
       else if (action === "edit-list-name") {
         if (data?.listId && data?.listName) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
-            if (shoppingLists[listIndex].ownerId === user.id) {
-              const updatedLists = [...shoppingLists];
+            if (shoppingLists.dataList[listIndex].ownerId === user.id) {
+              const updatedLists = [...shoppingLists.dataList];
               updatedLists[listIndex].listName = data.listName;
-              setShoppingLists(updatedLists);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
             } else {
               throw new Error("Current user is not owner of this list");
             }
@@ -179,14 +245,20 @@ function App() {
       else if (action === "add-list-member") {
         console.log("Data: ", data);
         if (data?.listId && data?.newMemberId) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
             console.log("user: ", user);
-            console.log("shoppinglist[index]", shoppingLists[listIndex]);
-            if (shoppingLists[listIndex].ownerId === user.id) {
-              const updatedLists = [...shoppingLists];
-              updatedLists[listIndex].membersIds.add(data.newMemberId);
-              setShoppingLists(updatedLists);
+            console.log("shoppinglist[index]", shoppingLists.dataList[listIndex]);
+            if (shoppingLists.dataList[listIndex].ownerId === user.id) {
+              const updatedLists = [...shoppingLists.dataList];
+              updatedLists[listIndex].membersIds.push(data.newMemberId);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
             } else {
               throw new Error("Current user is not owner of this list");
             }
@@ -199,13 +271,22 @@ function App() {
       }
       else if (action === "remove-list-member") {
         if (data?.listId && data?.removeMemberId) {
-          const listIndex = shoppingLists.findIndex((ls) => ls.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((ls) => ls.listId === data.listId);
           if (listIndex > -1) {
-            if (shoppingLists[listIndex].ownerId !== data.removeMemberId) {
-              const updatedLists = [...shoppingLists];
-              updatedLists[listIndex].membersIds.delete(data.removeMemberId);
+            if (shoppingLists.dataList[listIndex].ownerId !== data.removeMemberId) {
+              const updatedLists = [...shoppingLists.dataList];
+
+              const memberIndex = updatedLists[listIndex].membersIds.findIndex(data.removeMemberId);
+              updatedLists[listIndex].membersIds.splice(memberIndex, 1);
+
               console.log("updatedLists: ", updatedLists);
-              setShoppingLists(updatedLists);
+
+              const response = await updateShoppingList(updatedLists[listIndex]);
+
+              setShoppingLists((prevShoppingLists) => ({
+                ...prevShoppingLists,
+                dataList: updatedLists,
+              }));
             } else {
               throw new Error("Current user is owner of this list so he can't be deleted");
             }
@@ -216,14 +297,22 @@ function App() {
           throw new Error("Required data fields (listId, newMemberId) are missing.");
         }
       }
-
       else if (action === "create-list") {
         if (data.list) {
           const list = data.list;
 
           list.listId = uuidv4();
           console.log(list);
-          setShoppingLists([...shoppingLists, list]);
+
+          const response = await createShoppingList(list);
+          if (response.listObject) {
+            setShoppingLists((prevShoppingLists) => ({
+              ...prevShoppingLists,
+              dataList: [...prevShoppingLists.dataList, response.listObject]
+            }));
+          }
+
+
           return list;
         }
         else {
@@ -232,13 +321,20 @@ function App() {
       }
       else if (action === "delete-list") {
         if (data.listId) {
-          const listIndex = shoppingLists.findIndex((list) => list.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((list) => list.listId === data.listId);
           if (listIndex > -1) {
-            const updatedLists = [...shoppingLists];
+            const updatedLists = [...shoppingLists.dataList];
             updatedLists.splice(listIndex, 1); // Remove the list at the found index
 
+            const response = await deleteShoppingList(data.listId);
+
+            setShoppingLists((prevShoppingLists) => ({
+              ...prevShoppingLists,
+              dataList: updatedLists,
+            }));
+
             setSelectedShoppingList(updatedLists.length > 0 ? updatedLists[0] : null);
-            setShoppingLists(updatedLists);
+
             return "removed";
           } else {
             throw new Error(`List with ID '${data.listId}' not found.`);
@@ -250,12 +346,20 @@ function App() {
       }
       else if (action === "archive-list") {
         if (data.listId) {
-          const listIndex = shoppingLists.findIndex((list) => list.listId === data.listId);
+          const listIndex = shoppingLists.dataList.findIndex((list) => list.listId === data.listId);
           if (listIndex > -1) {
-            const newList = { ...shoppingLists[listIndex], archived: true };
-            const updatedLists = [...shoppingLists];
+            const newList = { ...shoppingLists.dataList[listIndex], archived: true };
+            const updatedLists = [...shoppingLists.dataList];
             updatedLists[listIndex] = newList;
-            setShoppingLists(updatedLists);
+
+            const response = await updateShoppingList(updatedLists[listIndex]);
+
+            setShoppingLists((prevShoppingLists) => ({
+              ...prevShoppingLists,
+              dataList: updatedLists,
+            }));
+
+            // setShoppingLists({ ...shoppingLists, dataList: updatedLists });
             return "archived";
           } else {
             throw new Error(`List with ID '${data.listId}' not found.`);
@@ -275,24 +379,34 @@ function App() {
     }
     catch (error) {
       console.error(`shopping list action (${action}) failed: `, error);
+      setShoppingLists((prevShoppingLists) => ({
+        ...prevShoppingLists,
+        errors: [...prevShoppingLists.errors, error],
+      }));
+      //throw error;
       return false;
     }
   }
 
   return (
-    <>
+    <>     
+
       <Header
-        shoppingLists={shoppingLists}
+        shoppingLists={shoppingLists.dataList}
         shoppingListAction={shoppingListAction}
         selectedShoppingList={selectedShoppingList}
         setSelectedShoppingList={setSelectedShoppingList}
+        state={shoppingLists.state}
       />
 
       <Container>
+        {shoppingLists.errors.map((error, i) => {
+          return <Alert variant="danger" key={i} dismissible>{error.toString()}</Alert>
+        })}
 
         <Row>
           <Col xs={12} xl={7} className="">
-            <main>
+            <main>             
               {selectedShoppingList ?
                 <ShoppingListDetail
                   shoppingList={selectedShoppingList}
@@ -314,7 +428,8 @@ function App() {
             <Row >
               <Lists
                 shoppingListAction={shoppingListAction}
-                shoppingLists={shoppingLists}
+                shoppingLists={shoppingLists.dataList}
+                state={shoppingLists.state}
                 selectedShoppingList={selectedShoppingList}
                 setSelectedShoppingList={setSelectedShoppingList}
               />

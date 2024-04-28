@@ -11,7 +11,9 @@ import { UserSelector } from './user';
 export const Header = (props) => {
     const {
         shoppingLists, shoppingListAction,
-        selectedShoppingList, setSelectedShoppingList
+        selectedShoppingList, setSelectedShoppingList,
+
+        state
     } = props;
 
     const [showCanvas, setShowCanvas] = useState(false);
@@ -53,6 +55,7 @@ export const Header = (props) => {
                                 shoppingLists={shoppingLists}
                                 selectedShoppingList={selectedShoppingList}
                                 setSelectedShoppingList={setSelectedShoppingList}
+                                state={state}
                             />
                         </Offcanvas.Body>
                     </Offcanvas>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Button from 'react-bootstrap/Button';
 
 const IconButton = (props) => {
-    const { icon, onClick, styling = "", text = "" } = props;
+    const { icon, onClick, styling = "", text = "", disabled = false } = props;
     const [style, setStyle] = useState("");
 
     useEffect(() => {
@@ -12,7 +12,7 @@ const IconButton = (props) => {
     }, [styling]);
 
     return (
-        <Button onClick={onClick} className={style} >
+        <Button onClick={onClick} className={style} disabled={disabled} >
             {text && <span className="fw-bold"> {text} </span>}
             {icon &&
                 <span className="">

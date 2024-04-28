@@ -129,7 +129,7 @@ const ShoppingListDetail = (prop) => {
         )
     }
 
-    if (shoppingList.ownerId === user.id || shoppingList.membersIds.has(user.id)) {
+    if (shoppingList.ownerId === user.id || shoppingList.membersIds.includes(user.id)) {
 
         return (
             <>
@@ -260,7 +260,7 @@ const ShoppingListDetail = (prop) => {
 
                                     <Dropdown.Menu className="border-secondary border-2">
                                         {USERS.map((us, i) => {
-                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.has(us.id)) return <React.Fragment key={i}></React.Fragment>
+                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.includes(us.id)) return <React.Fragment key={i}></React.Fragment>
                                             else {
                                                 return (
                                                     <Dropdown.Item key={i} onClick={() => addlistMemberHandler(us.id)}>
@@ -291,7 +291,7 @@ const ShoppingListDetail = (prop) => {
                                     </strong>
                                 </ListGroup.Item>
 
-                                {[...shoppingList.membersIds].map((memberId, i) => {
+                                {shoppingList.membersIds.map((memberId, i) => {
                                     return (
                                         <ListGroup.Item
                                             key={i}
@@ -324,7 +324,7 @@ const ShoppingListDetail = (prop) => {
                     </Row>
                     <Row className="mt-3">
                         <Col>
-                            {shoppingList.membersIds.values().map((memberId) => {
+                            {shoppingList?.membersIds?.map((memberId) => {
                                 return (
                                     <ListGroup.Item
                                         key={memberId}

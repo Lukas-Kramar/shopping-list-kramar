@@ -5,6 +5,8 @@ import Badge from 'react-bootstrap/Badge';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/esm/Row';
 import Col from 'react-bootstrap/esm/Col';
+import Spinner from 'react-bootstrap/Spinner';
+
 import { useUser } from '../header/user';
 
 import { faBars, faEye, faEyeSlash, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -14,12 +16,15 @@ import IconButton from '../buttons/IconButton';
 import BasicModal from '../modals/BasicModal';
 
 
+
 const Lists = (props) => {
     const {
         shoppingListAction,
         // showArchived, setShowArchived,
         shoppingLists,
-        selectedShoppingList, setSelectedShoppingList
+        selectedShoppingList, setSelectedShoppingList,
+
+        state
     } = props;
 
     const user = useUser();
@@ -31,7 +36,11 @@ const Lists = (props) => {
 
 
     useEffect(() => {
-        const usersLists = shoppingLists.filter((shopList) => shopList.ownerId === user.id || shopList.membersIds.has(user.id));
+        console.log("Lists - shoppingLIsts: ", shoppingLists);
+
+        if (!shoppingLists || shoppingLists.length < 1) { return; }
+
+        const usersLists = shoppingLists.filter((shopList) => shopList.ownerId === user.id || shopList?.membersIds?.includes(user.id));
         const archived = [];
         const active = [];
         usersLists.forEach(list => {
@@ -41,12 +50,16 @@ const Lists = (props) => {
         setDisplayedLists({ active: active, archived: archived });
     }, [shoppingLists, user.id]);
 
+    useEffect(() => {
+        
+    }, [state]);
+
 
 
     const showCreateList = () => {
         setFormList({
             ownerId: user.id,
-            membersIds: new Set(),
+            membersIds: [],
             listName: "",
             productsInList: [],
             archived: false,
@@ -54,19 +67,26 @@ const Lists = (props) => {
         setModalVersion("create-list");
     }
 
-    const createListHandler = () => {
-        shoppingListAction("create-list", { list: formList });
-        setModalVersion("");
+    const createListHandler = async () => {
+        try {
+
+            shoppingListAction("create-list", { list: formList });
+            setModalVersion("");
+        }
+        catch (err) {
+
+        }
     }
 
     const ListItem = (props) => {
         const { list, variant = "secondary" } = props;
+        if (!list.listId) return null;
         return (
             <ListGroup.Item
                 variant={variant}
                 className='d-flex justify-content-between'
                 action
-                disabled={list.listId === selectedShoppingList.listId}
+                disabled={list.listId === selectedShoppingList?.listId}
                 onClick={() => setSelectedShoppingList(list)}
             >
                 <div>
@@ -114,6 +134,7 @@ const Lists = (props) => {
                         onClick={showCreateList}
                         icon={faPlus}
                         styling="d-flex  justify-content-between w-100"
+                        disabled={state !== "done"}
                     />
                 </Col>
             </Row>
@@ -125,22 +146,40 @@ const Lists = (props) => {
                         onClick={() => setShowArchived(!showArchived)}
                         icon={showArchived ? faEyeSlash : faEye}
                         styling="d-flex justify-content-between w-50"
+                        disabled={state !== "done"}
                     />
                 </Col>
             </Row>
 
             <Row className='mb-3 h-60 overflow-auto'>
                 <Col>
-                    <ListGroup>
-                        {displayedLists.active.map((activeList) => (
-                            <ListItem key={activeList.listId} variant="info" list={activeList} />
-                        ))}
-                        {showArchived &&
-                            displayedLists.archived.map((activeList) => (
-                                <ListItem key={activeList.listId} variant="secondary" list={activeList} />
-                            ))
-                        }
-                    </ListGroup>
+                    {state === "done" ?
+                        <ListGroup>
+                            {
+                                displayedLists?.active?.length > 0 || displayedLists?.archived?.length > 0 ? (
+                                    <>
+                                        {displayedLists.active.map((activeList) => (
+                                            <ListItem key={activeList.listId} variant="info" list={activeList} />
+                                        ))}
+                                        {showArchived &&
+                                            displayedLists.archived.map((archivedList) => (
+                                                <ListItem key={archivedList.listId} variant="secondary" list={archivedList} />
+                                            ))}
+                                    </>
+                                ) : (
+                                    <ListGroup.Item disabled variant="secondary">
+                                        No shopping lists available
+                                    </ListGroup.Item>
+                                )
+                            }
+
+
+                        </ListGroup>
+                        :
+                        <Spinner animation="border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </Spinner>
+                    }
                 </Col>
             </Row>
 

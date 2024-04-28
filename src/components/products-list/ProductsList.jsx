@@ -1,6 +1,6 @@
 import { faSquare, faSquareCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 
@@ -8,6 +8,8 @@ const ProductsList = (props) => {
     const { listId, products,
         shoppingListAction, closeModal,
     } = props;
+
+    const [errors, setErrors] = useState([]);
 
     const toggleProductHandler = (productName) => {
         console.log("toggle-product-accomplished");
