@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import IconButton from '../buttons/IconButton';
 import BasicModal from '../modals/BasicModal';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -27,6 +28,7 @@ const Lists = (props) => {
         state
     } = props;
 
+    const { t } = useTranslation();
     const user = useUser();
 
     const [formList, setFormList] = useState(null);
@@ -51,7 +53,7 @@ const Lists = (props) => {
     }, [shoppingLists, user.id]);
 
     useEffect(() => {
-        
+
     }, [state]);
 
 
@@ -103,17 +105,17 @@ const Lists = (props) => {
             {/* CREATE LIST MODAL */}
             <BasicModal
                 visible={modalVersion === "create-list"}
-                title="Create list"
-                closeButtonText="Close"
-                actionButtonText="Save"
+                title={t('List.modals.CreateListModal.title')}
+                closeButtonText={t('defaultValues.close')}
+                actionButtonText={t('defaultValues.save')}
                 actionButtonDisabled={!(formList?.listName.length > 4)}
                 onActionButtonClick={createListHandler}
                 onCloseButtonClick={() => setModalVersion("")}
             >
                 <Form noValidate onSubmit={createListHandler}>
                     <Row >
-                        <Form.Group as={Col} controlId="validataionProductName">
-                            <Form.Label>List Name:</Form.Label>
+                        <Form.Group as={Col} controlId="validationListName">
+                            <Form.Label>{t('List.modals.CreateListModal.listName')}</Form.Label>
                             <Form.Control
                                 required
                                 type="text"
@@ -121,7 +123,7 @@ const Lists = (props) => {
                                 isValid={formList?.listName.length > 4}
                                 onChange={(val) => { setFormList({ ...formList, listName: val.target.value }) }}
                             />
-                            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+                            <Form.Control.Feedback>{t('defaultValues.validFeedback')}</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
                 </Form>
@@ -130,7 +132,7 @@ const Lists = (props) => {
             <Row className='mb-3'>
                 <Col>
                     <IconButton
-                        text="Create list"
+                        text={t('List.createListButton')}
                         onClick={showCreateList}
                         icon={faPlus}
                         styling="d-flex  justify-content-between w-100"
@@ -142,10 +144,10 @@ const Lists = (props) => {
             <Row className='mb-3'>
                 <Col>
                     <IconButton
-                        text={showArchived ? "Hide Archived" : "Show Archived"}
+                        text={showArchived ? t('List.hideArchivedButton') : t('List.showArchivedButton')}
                         onClick={() => setShowArchived(!showArchived)}
                         icon={showArchived ? faEyeSlash : faEye}
-                        styling="d-flex justify-content-between w-50"
+                        styling="d-flex justify-content-between w-75"
                         disabled={state !== "done"}
                     />
                 </Col>
@@ -168,7 +170,7 @@ const Lists = (props) => {
                                     </>
                                 ) : (
                                     <ListGroup.Item disabled variant="secondary">
-                                        No shopping lists available
+                                        {t('List.emptyShoppingListArray')}
                                     </ListGroup.Item>
                                 )
                             }
@@ -177,7 +179,7 @@ const Lists = (props) => {
                         </ListGroup>
                         :
                         <Spinner animation="border" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                            <span className="visually-hidden">{t('defaultValues.loading')}</span>
                         </Spinner>
                     }
                 </Col>

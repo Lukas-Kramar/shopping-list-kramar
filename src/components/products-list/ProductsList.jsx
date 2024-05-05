@@ -3,11 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
+import { useTranslation } from 'react-i18next';
 
 const ProductsList = (props) => {
     const { listId, products,
         shoppingListAction, closeModal,
     } = props;
+
+    const { t } = useTranslation();
 
     const [errors, setErrors] = useState([]);
 
@@ -39,7 +42,7 @@ const ProductsList = (props) => {
 
     if (!products) {
         return (
-            <p>Undefined products</p>
+            <p>{t('ProductList.undefinedProducts')}</p>
         )
     }
 
@@ -52,6 +55,7 @@ const ProductsList = (props) => {
                         className={`d-flex my-2 align-items-center rounded ${product.accomplished ? "bg-secondary" : "bg-info"}`}
                         action={product.accomplished ? false : true}
                         onClick={() => toggleProductHandler(product.productName)}
+                        style={{ color: "black" }}
                     >
                         <span className='me-3'>
                             <FontAwesomeIcon size="2x" icon={product.accomplished ? faSquareCheck : faSquare} />

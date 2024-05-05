@@ -7,6 +7,8 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import BasicModal from '../modals/BasicModal';
 import Lists from '../lists/Lists';
 import { UserSelector } from './user';
+import { useTranslation } from 'react-i18next';
+import ThemeSwitcher from '../theme-switcher/ThemeSwitcher';
 
 export const Header = (props) => {
     const {
@@ -15,6 +17,8 @@ export const Header = (props) => {
 
         state
     } = props;
+
+    const { t } = useTranslation();
 
     const [showCanvas, setShowCanvas] = useState(false);
 
@@ -30,7 +34,12 @@ export const Header = (props) => {
 
                     </Navbar.Brand>
 
-                    <UserSelector />
+                    <div className='d-flex flex-row align-items-center'>
+                        <UserSelector />
+                        <ThemeSwitcher />
+                    </div>
+
+
 
                     <Navbar.Toggle
                         onClick={() => setShowCanvas(true)}
@@ -46,7 +55,7 @@ export const Header = (props) => {
                     >
                         <Offcanvas.Header closeButton>
                             <Offcanvas.Title id={`offcanvasNavbarLabel-expand`}>
-                                Shopping Lists:
+                                {t('Header.shoppingLists')}
                             </Offcanvas.Title>
                         </Offcanvas.Header>
                         <Offcanvas.Body>

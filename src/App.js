@@ -14,51 +14,14 @@ import Header from './components/header/Header';
 import { v4 as uuidv4 } from 'uuid';
 import Lists from './components/lists/Lists';
 import { createShoppingList, deleteShoppingList, getShoppingLists, updateShoppingList } from './api/apiCalls';
-
-const defaultShoppingList = [
-  {
-    listId: "abcdf", ownerId: "123", membersIds: new Set(["234", "345"]),
-    listName: "První shopping list",
-    productsInList: [
-      { productName: "Mléko", accomplished: false },
-      { productName: "Mouka", accomplished: false },
-      { productName: "Pažitka", accomplished: true },
-      { productName: "Mléko1", accomplished: true },
-      { productName: "Mouka2", accomplished: false },
-      { productName: "Pažitka3", accomplished: true },
-      { productName: "Mléko4", accomplished: true },
-      { productName: "Mouka5", accomplished: false },
-      { productName: "Pažitka6", accomplished: true },
-    ],
-    archived: false,
-  },
-  {
-    listId: "fjowefjweoifj", ownerId: "234", membersIds: new Set(["123", "345", "456"]),
-    listName: "Shopping list pro všechny",
-    productsInList: [
-      { productName: "Jablka", accomplished: false },
-      { productName: "Citróny", accomplished: true },
-      { productName: "Okurka", accomplished: true },
-      { productName: "Máslo", accomplished: false }
-    ],
-    archived: false,
-  },
-  {
-    listId: "aaaaaaaaa", ownerId: "234", membersIds: new Set(["123", "345", "456"]),
-    listName: "Shopping list pro všechny",
-    productsInList: [
-      { productName: "Jablka", accomplished: true },
-      { productName: "Citróny", accomplished: true },
-      { productName: "Okurka", accomplished: true },
-      { productName: "Máslo", accomplished: true }
-    ],
-    archived: true,
-  }
-]
-
+import { useTranslation } from 'react-i18next';
+import { useTheme } from './components/theme-switcher/ThemeContext';
 
 function App() {
   const user = useUser();
+
+  const { isDarkMode, setIsDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   const [shoppingLists, setShoppingLists] = useState({ dataList: [], state: "", errors: [] });
   const [selectedShoppingList, setSelectedShoppingList] = useState(null);
@@ -276,7 +239,7 @@ function App() {
             if (shoppingLists.dataList[listIndex].ownerId !== data.removeMemberId) {
               const updatedLists = [...shoppingLists.dataList];
 
-              const memberIndex = updatedLists[listIndex].membersIds.findIndex(data.removeMemberId);
+              const memberIndex = updatedLists[listIndex].membersIds.findIndex((member) => member.id === data.removeMemberId);
               updatedLists[listIndex].membersIds.splice(memberIndex, 1);
 
               console.log("updatedLists: ", updatedLists);
@@ -389,7 +352,7 @@ function App() {
   }
 
   return (
-    <>     
+    <>
 
       <Header
         shoppingLists={shoppingLists.dataList}
@@ -405,8 +368,9 @@ function App() {
         })}
 
         <Row>
-          <Col xs={12} xl={7} className="">
-            <main>             
+
+          <Col xs={12} xl={7} >
+            <main className="mb-0 pb-0">
               {selectedShoppingList ?
                 <ShoppingListDetail
                   shoppingList={selectedShoppingList}
@@ -414,15 +378,16 @@ function App() {
                 />
                 :
                 <Alert variant="danger">
-                  No shopping list selected (if none are present - we would be happy if you could create one)
+                  {t('App.alertNoShopListSelected')}
                 </Alert>
               }
             </main>
           </Col>
-          <Col xl={5} className="mt-4 d-none d-xl-block" style={{ backgroundColor: "#f4f4f4" }}>
+
+          <Col xl={5} className={`mt-4 d-none d-xl-block ${isDarkMode ? "bg-dark" : "bg-light"}`}>
 
             <Row className=" mb-3 container-fluid ">
-              <h1>Shopping lists:</h1>
+              <h1>{t('App.title')}</h1>
             </Row>
 
             <Row >

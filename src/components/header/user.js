@@ -1,4 +1,3 @@
-// import { useState, Utils } from "uu5g05";
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import { createContext, useContext, useState } from "react";
@@ -10,10 +9,8 @@ export const USERS = [
   { id: "456", name: "Chloe" }
 ];
 
-// in pure react
 const UserContext = createContext();
 const useUserContext = () => useContext(UserContext);
-// const [UserContext, useUserContext] = Utils.Context.create([]);
 
 function UserProvider({ children }) {
   const userParams = useState(USERS[0]);
@@ -29,9 +26,9 @@ function UserSelector() {
   const [user, setUser] = useUserContext();
 
   return (
-    <Dropdown>
+    <Dropdown className='' align={"end"}>
       <Dropdown.Toggle variant="warning" id="dropdown-basic">
-        {user.name} 
+        {user.name}
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
@@ -44,7 +41,7 @@ function UserSelector() {
             {name}
           </Dropdown.Item>
         ))}
-        
+
       </Dropdown.Menu>
     </Dropdown>
   );

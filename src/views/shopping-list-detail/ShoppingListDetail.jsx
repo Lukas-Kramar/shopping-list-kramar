@@ -15,9 +15,14 @@ import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 
 import Form from 'react-bootstrap/Form';
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../components/theme-switcher/ThemeContext";
 
 const ShoppingListDetail = (prop) => {
     const { shoppingList, shoppingListAction } = prop;
+
+    const { t } = useTranslation();
+    const { isDarkMode, setIsDarkMode } = useTheme();
 
     const [modalVersion, setModalVersion] = useState("");
     const [formChanged, setFormChange] = useState(false);
@@ -124,7 +129,7 @@ const ShoppingListDetail = (prop) => {
     if (!shoppingList) {
         return (
             <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading List Detail...</span>
+                <span className="visually-hidden">{t('defaultValues.loading')}</span>
             </Spinner>
         )
     }
@@ -136,9 +141,9 @@ const ShoppingListDetail = (prop) => {
                 {/* ADD PRODUCT MODAL*/}
                 <BasicModal
                     visible={modalVersion === "add-product"}
-                    title="Add product"
-                    closeButtonText="Close"
-                    actionButtonText="Add"
+                    title={t('ShoppingListDetail.modals.AddProductModal.title')}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('defaultValues.add')}
                     onActionButtonClick={addProductHandler}
                     actionButtonDisabled={!productName}
                     onCloseButtonClick={closeModal}
@@ -147,54 +152,27 @@ const ShoppingListDetail = (prop) => {
                     <Form noValidate onSubmit={addProductHandler}>
                         <Row >
                             <Form.Group as={Col} controlId="validataionProductName">
-                                <Form.Label>Product Name:</Form.Label>
+                                <Form.Label>{t('ShoppingListDetail.modals.AddProductModal.productName')}</Form.Label>
                                 <Form.Control
                                     required
                                     type="text"
-                                    placeholder="Nová položka..."
+                                    placeholder={t('ShoppingListDetail.modals.AddProductModal.placeHolder')}
                                     value={productName}
                                     isValid={productName && formChanged}
                                     onChange={(val) => { setFormChange(true); setProductName(val.target.value); }}
                                 />
-                                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+                                <Form.Control.Feedback>{t('defaultValues.validFeedback')}</Form.Control.Feedback>
                             </Form.Group>
                         </Row>
                     </Form>
                 </BasicModal>
 
-                {/* CREATE LIST MODAL */}
-                {/* <BasicModal
-                    visible={modalVersion === "create-list"}
-                    title="Create new list"
-                    closeButtonText="Close"
-                    actionButtonText="Create"
-                    onActionButtonClick={createNewListHandler}
-                    onCloseButtonClick={closeModal}
-                >                   
-                    <Form noValidate onSubmit={createNewListHandler}>
-                        <Row >
-                            <Form.Group as={Col} controlId="validataionProductName">
-                                <Form.Label>List Name:</Form.Label>
-                                <Form.Control
-                                    required
-                                    type="text"
-                                    placeholder="Nový list..."
-                                    value={productName}
-                                    isValid={productName && formChanged}
-                                    onChange={(val) => { setFormChange(true); setProductName(val.target.value); }}
-                                />
-                                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-                            </Form.Group>
-                        </Row>
-                    </Form>
-                </BasicModal> */}
-
                 {/* RENAME LIST MODAL */}
                 <BasicModal
                     visible={modalVersion === "rename-list"}
-                    title="Rename list"
-                    closeButtonText="Close"
-                    actionButtonText="Save"
+                    title={t('ShoppingListDetail.modals.RenameProductModal.title')}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('defaultValues.save')}
                     actionButtonDisabled={!formChanged || !listName}
                     onActionButtonClick={renameListHandler}
                     onCloseButtonClick={closeModal}
@@ -202,7 +180,7 @@ const ShoppingListDetail = (prop) => {
                     <Form noValidate onSubmit={renameListHandler}>
                         <Row >
                             <Form.Group as={Col} controlId="validataionProductName">
-                                <Form.Label>List Name:</Form.Label>
+                                <Form.Label>{t('ShoppingListDetail.modals.RenameProductModal.listName')}</Form.Label>
                                 <Form.Control
                                     required
                                     type="text"
@@ -210,7 +188,7 @@ const ShoppingListDetail = (prop) => {
                                     isValid={listName && formChanged}
                                     onChange={(val) => { setFormChange(true); setListName(val.target.value); }}
                                 />
-                                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+                                <Form.Control.Feedback>{t('defaultValues.validFeedback')}</Form.Control.Feedback>
                             </Form.Group>
                         </Row>
                     </Form>
@@ -219,10 +197,10 @@ const ShoppingListDetail = (prop) => {
                 {/* ARCHIVE LIST MODAL */}
                 <BasicModal
                     visible={modalVersion === "archive-list"}
-                    title="Archive list"
-                    text={`Do you really want to Archive this list: ${shoppingList.listName}`}
-                    closeButtonText="Close"
-                    actionButtonText="Archive"
+                    title={t('ShoppingListDetail.modals.ArchiveListModal.title')}
+                    text={`${t('ShoppingListDetail.modals.ArchiveListModal.text')} ${shoppingList.listName}?`}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('ShoppingListDetail.modals.ArchiveListModal.actionButton')}
                     onActionButtonClick={archiveListHandler}
                     onCloseButtonClick={closeModal}
                 >
@@ -231,10 +209,10 @@ const ShoppingListDetail = (prop) => {
                 {/* DELETE LIST MODAL */}
                 <BasicModal
                     visible={modalVersion === "delete-list"}
-                    title="Delete list"
-                    text={`Do you really want to Delete this list: ${shoppingList.listName}`}
-                    closeButtonText="Close"
-                    actionButtonText="Delete"
+                    title={t('ShoppingListDetail.modals.DeleteListModal.title')}
+                    text={`${t('ShoppingListDetail.modals.DeleteListModal.text')} ${shoppingList.listName}?`}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('ShoppingListDetail.modals.DeleteListModal.actionButton')}
                     onActionButtonClick={deleteListHandler}
                     onCloseButtonClick={closeModal}
                 >
@@ -243,9 +221,9 @@ const ShoppingListDetail = (prop) => {
                 {/* MANAGE MEMBERS MODAL */}
                 <BasicModal
                     visible={modalVersion === "view-list-members"}
-                    title="Manage members"
-                    closeButtonText="Close"
-                    actionButtonText="Ok"
+                    title={t('ShoppingListDetail.modals.ManageListMembersModal.title')}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('defaultValues.ok')}
                     onActionButtonClick={closeModal}
                     onCloseButtonClick={closeModal}
                 >
@@ -254,13 +232,13 @@ const ShoppingListDetail = (prop) => {
                             {shoppingList.ownerId === user.id &&
                                 <Dropdown drop={"down"} style={{}} >
                                     <Dropdown.Toggle variant="primary" id="owner-actions-dropdown" >
-                                        <span className="fw-bold me-4">Add member</span>
+                                        <span className="fw-bold me-4">{t('ShoppingListDetail.modals.ManageListMembersModal.addMember')}</span>
                                         <FontAwesomeIcon icon={faPlus} className="me-4" />
                                     </Dropdown.Toggle>
 
                                     <Dropdown.Menu className="border-secondary border-2">
                                         {USERS.map((us, i) => {
-                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.includes(us.id)) return <React.Fragment key={i}></React.Fragment>
+                                            if (shoppingList.ownerId === us.id || shoppingList.membersIds.includes(us.id)) return null;
                                             else {
                                                 return (
                                                     <Dropdown.Item key={i} onClick={() => addlistMemberHandler(us.id)}>
@@ -287,7 +265,7 @@ const ShoppingListDetail = (prop) => {
                                     </span>
 
                                     <strong >
-                                        Owner: {USERS.find((us) => us.id === shoppingList.ownerId).name}
+                                        {t('ShoppingListDetail.modals.ManageListMembersModal.owner')} {USERS.find((us) => us.id === shoppingList.ownerId).name}
                                     </strong>
                                 </ListGroup.Item>
 
@@ -355,20 +333,20 @@ const ShoppingListDetail = (prop) => {
                 {/* LEAVE LIST MODAL */}
                 <BasicModal
                     visible={modalVersion === "leave-list"}
-                    title="Leave list"
-                    text={`Do you really want to leave this list: ${shoppingList.listName}?`}
-                    closeButtonText="Close"
-                    actionButtonText="Leave"
+                    title={t('ShoppingListDetail.modals.LeaveListModal.title')}
+                    text={`${t('ShoppingListDetail.modals.LeaveListModal.text')} ${shoppingList.listName}?`}
+                    closeButtonText={t('defaultValues.close')}
+                    actionButtonText={t('ShoppingListDetail.modals.LeaveListModal.actionButton')}
                     onActionButtonClick={leaveListHandler}
                     onCloseButtonClick={closeModal}
                 >
                 </BasicModal>
 
-                <Container className="mt-4" fluid style={{ backgroundColor: "#f4f4f4" }}>
+                <Container fluid className={`mt-4 ${isDarkMode ? "bg-dark" : "bg-light"}`}>
                     <h2>
                         {shoppingList.listName ?
-                            `${shoppingList.listName} ${shoppingList.archived ? "(ARCHIVED)" : ""}`
-                            : "-----"
+                            `${shoppingList.listName} ${shoppingList.archived ? t('ShoppingListDetail.archived') : ""}`
+                            : t('defaultValues.undefined')
                         }
                     </h2>
                     <Row className="mt-3">
@@ -376,7 +354,7 @@ const ShoppingListDetail = (prop) => {
                             {shoppingList?.ownerId === user?.id ?
                                 <>
                                     <IconButton
-                                        text="Manage members"
+                                        text={t('ShoppingListDetail.manageMembersButton')}
                                         onClick={() => showModal("view-list-members")}
                                         styling="me-2"
                                     />
@@ -394,7 +372,7 @@ const ShoppingListDetail = (prop) => {
                                                 }}
                                             >
                                                 <FontAwesomeIcon icon={faPen} className="me-4" />
-                                                <span className="fw-bold">Rename list</span>
+                                                <span className="fw-bold">{t('ShoppingListDetail.renameListButton')}</span>
                                             </Dropdown.Item>
                                             <Dropdown.Item
                                                 onClick={() => {
@@ -402,7 +380,7 @@ const ShoppingListDetail = (prop) => {
                                                 }}
                                             >
                                                 <FontAwesomeIcon icon={faBookBookmark} className="me-4" />
-                                                <span className="fw-bold"> Archive list</span>
+                                                <span className="fw-bold">{t('ShoppingListDetail.archiveListButton')}</span>
                                             </Dropdown.Item>
                                             <Dropdown.Item
                                                 onClick={() => {
@@ -410,7 +388,7 @@ const ShoppingListDetail = (prop) => {
                                                 }}
                                             >
                                                 <FontAwesomeIcon icon={faTrash} className="me-4" />
-                                                <span className="fw-bold"> Delete list</span>
+                                                <span className="fw-bold">{t('ShoppingListDetail.deleteListButton')}</span>
                                             </Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
@@ -418,7 +396,7 @@ const ShoppingListDetail = (prop) => {
                                 :
                                 <>
                                     <IconButton
-                                        text="View members"
+                                        text={t('ShoppingListDetail.viewMembers')}
                                         onClick={() => showModal("view-list-members")}
                                         styling="me-2"
                                     />
@@ -437,7 +415,7 @@ const ShoppingListDetail = (prop) => {
                     <Row className="mt-3">
                         <Col>
                             <IconButton
-                                text="Add product"
+                                text={t('ShoppingListDetail.addProductButton')}
                                 onClick={() => showModal("add-product")}
                                 icon={faPlus}
                                 styling="d-flex justify-content-between w-100"
@@ -448,10 +426,10 @@ const ShoppingListDetail = (prop) => {
                     <Row className="mt-3">
                         <Col>
                             <IconButton
-                                text={showAccomplished ? "Hide Accomplished" : "Show Accomplished"}
+                                text={showAccomplished ? t('ShoppingListDetail.hideAccomplishedToggle') : t('ShoppingListDetail.showAccomplishedToggle')}
                                 onClick={() => setShowAccomplished(!showAccomplished)}
                                 icon={showAccomplished ? faEyeSlash : faEye}
-                                styling="d-flex justify-content-between w-50"
+                                styling="d-flex justify-content-between w-75"
                             />
                         </Col>
                     </Row>
