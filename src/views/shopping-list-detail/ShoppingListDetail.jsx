@@ -301,7 +301,7 @@ const ShoppingListDetail = (prop) => {
                         </Col>
                     </Row>
                     <Row className="mt-3">
-                        <Col>
+                        {/* <Col>
                             {shoppingList?.membersIds?.map((memberId) => {
                                 return (
                                     <ListGroup.Item
@@ -326,7 +326,7 @@ const ShoppingListDetail = (prop) => {
                                     </ListGroup.Item>
                                 )
                             })}
-                        </Col>
+                        </Col> */}
                     </Row>
                 </BasicModal>
 
