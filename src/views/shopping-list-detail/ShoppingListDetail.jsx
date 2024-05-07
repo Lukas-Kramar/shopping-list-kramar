@@ -1,28 +1,33 @@
 import React, { useEffect, useState } from "react";
+
 import IconButton from "../../components/buttons/IconButton";
-import Spinner from 'react-bootstrap/Spinner';
-import Container from 'react-bootstrap/Container'
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
+
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ProductsList from "../../components/products-list/ProductsList";
-import { faArrowRightToBracket, faBookBookmark, faCircle, faCircleMinus, faCirclePlus, faEllipsisV, faEye, faEyeSlash, faPen, faPlus, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+import Spinner from 'react-bootstrap/Spinner';
+import Container from 'react-bootstrap/Container'
 import Dropdown from 'react-bootstrap/Dropdown';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { USERS, useUser } from "../../components/header/user";
-import BasicModal from "../../components/modals/BasicModal";
+import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 
-import Form from 'react-bootstrap/Form';
-import { useTranslation } from "react-i18next";
+import { faArrowRightToBracket, faBookBookmark, faCircleMinus, faCirclePlus, faEllipsisV, faEye, faEyeSlash, faPen, faPlus, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+
+import ProductsList from "../../components/products-list/ProductsList";
+import { USERS, useUser } from "../../components/header/user";
+import BasicModal from "../../components/modals/BasicModal";
 import { useTheme } from "../../components/theme-switcher/ThemeContext";
+import AcomplishedPieChart from "../../components/charts/AcomplishedPieChart";
 
 const ShoppingListDetail = (prop) => {
     const { shoppingList, shoppingListAction } = prop;
 
     const { t } = useTranslation();
-    const { isDarkMode, setIsDarkMode } = useTheme();
+    const { isDarkMode } = useTheme();
 
     const [modalVersion, setModalVersion] = useState("");
     const [formChanged, setFormChange] = useState(false);
@@ -274,8 +279,6 @@ const ShoppingListDetail = (prop) => {
                                         <ListGroup.Item
                                             key={i}
                                             className={`d-flex my-2 align-items-center rounded bg-secondary`}
-                                        // action={product.accomplished ? false : true}
-                                        // onClick={() => toggleProductHandler(product.productName)}
                                         >
                                             <span className='me-3'>
                                                 <FontAwesomeIcon size="2x" icon={faUser} />
@@ -297,36 +300,7 @@ const ShoppingListDetail = (prop) => {
                                 })}
                             </ListGroup>
 
-
                         </Col>
-                    </Row>
-                    <Row className="mt-3">
-                        {/* <Col>
-                            {shoppingList?.membersIds?.map((memberId) => {
-                                return (
-                                    <ListGroup.Item
-                                        key={memberId}
-                                        className={`d-flex my-2 align-items-center rounded bg-secondary`}
-                                        action={false}
-                                    >
-                                        <span className='me-3'>
-                                            <FontAwesomeIcon size="2x" icon={faCircle} />
-                                        </span>
-
-                                        <strong >
-                                            {USERS.find((user) => user.id === memberId).name}
-                                        </strong>
-
-                                        <Button
-                                            className='ms-auto' variant="danger"
-                                        // onClick={() => removeProductHandler(product.productName)}
-                                        >
-                                            <FontAwesomeIcon icon={faCircleMinus} />
-                                        </Button>
-                                    </ListGroup.Item>
-                                )
-                            })}
-                        </Col> */}
                     </Row>
                 </BasicModal>
 
@@ -409,7 +383,6 @@ const ShoppingListDetail = (prop) => {
                                 </>
                             }
                         </Col>
-
                     </Row>
 
                     <Row className="mt-3">
@@ -434,6 +407,17 @@ const ShoppingListDetail = (prop) => {
                         </Col>
                     </Row>
 
+                    <Row className="d-flex align-items-center">
+                        <Col>
+                            <p className="fw-bold mt-3 ">{t('ShoppingListDetail.chartAccomplishedProducts')}</p>
+                        </Col>
+                        <Col>
+                            <AcomplishedPieChart
+                                products={shoppingList.productsInList}
+                            />
+                        </Col>
+                    </Row>
+
                     <Row className="my-3">
                         <Col className="">
                             <ProductsList
@@ -444,6 +428,7 @@ const ShoppingListDetail = (prop) => {
                             />
                         </Col>
                     </Row>
+
                     <Row className="my-3">
                         {showAccomplished &&
                             <Col className="">

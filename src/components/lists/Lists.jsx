@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import IconButton from '../buttons/IconButton';
 import BasicModal from '../modals/BasicModal';
 import { useTranslation } from 'react-i18next';
+import ShoppingListBarChart from '../charts/ShoppingListsBarChart';
 
 
 
@@ -150,6 +151,12 @@ const Lists = (props) => {
                         styling="d-flex justify-content-between w-75"
                         disabled={state !== "done"}
                     />
+                </Col>
+            </Row>
+
+            <Row>
+                <Col>
+                    <ShoppingListBarChart shoppingLists={shoppingLists} />
                 </Col>
             </Row>
 

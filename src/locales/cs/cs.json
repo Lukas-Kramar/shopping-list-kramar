@@ -53,6 +53,7 @@
     "addProductButton": "Přidat produkt",
     "showAccomplishedToggle": "Zobrazit splněné položky",
     "hideAccomplishedToggle": "Schovat splněné položky",
+    "chartAccomplishedProducts": "Grafické znázornění nakoupených položek:",
     "errorTitle": "Error 404: Seznam nebyl nalezen",
     "errorAlert": "Seznam s tímto ID neexistuje, anebo nejste jeho členem/správcem."
   },
@@ -70,6 +71,13 @@
   },
   "ProductList": {
     "undefinedProducts": "Produkty se nepodařilo načíst"
+  },
+  "AcomplishedPieChart": {
+    "accomplished": "Splněné položky",
+    "unAccomplished": "Nesplněné položky"
+  },
+  "ShoppingListBarChart": {
+    "items": "Počet položek:"
   },
   "defaultValues": {
     "undefined": "----",

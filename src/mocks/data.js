@@ -28,7 +28,7 @@ export const mockData = [
     },
     {
         listId: "aaaaaaaaa", ownerId: "234", membersIds: ["123", "345", "456"],
-        listName: "Shopping list pro všechny",
+        listName: "LIst domácí",
         productsInList: [
             { productName: "Jablka", accomplished: true },
             { productName: "Citróny", accomplished: true },

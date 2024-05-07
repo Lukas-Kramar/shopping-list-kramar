@@ -53,6 +53,7 @@
     "addProductButton": "Add Product",
     "showAccomplishedToggle": "Show Accomplished Items",
     "hideAccomplishedToggle": "Hide Accomplished Items",
+    "chartAccomplishedProducts": "Graph showing number of Accomplished and Unaccomplished products:",
     "errorTitle": "Error 404: List Not Found",
     "errorAlert": "This list with the given ID does not exist, or you are not a member/owner."
   },
@@ -70,6 +71,13 @@
   },
   "ProductList": {
     "undefinedProducts": "Failed to load products"
+  },
+  "AcomplishedPieChart": {
+    "accomplished": "Accomplished Products",
+    "unAccomplished": "Unaccomplished Products"
+  },
+  "ShoppingListBarChart": {
+    "items": "Number of Items:"
   },
   "defaultValues": {
     "undefined": "----",
